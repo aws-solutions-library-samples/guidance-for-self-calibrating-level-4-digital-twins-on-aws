@@ -3,18 +3,13 @@ FROM ${REGISTRY}twinflow:latest
 
 RUN apt-get update
 
-
 ADD iot_config.json /
-ADD uncertainty_config.json /
-ADD optimization_config.json /
-ADD sensitivity_config.json /
 
 ADD web_line_3_linux.fmu /
 ADD fmu_calibrate.py /
 
 WORKDIR /
 
-#ENTRYPOINT ["python", "fmu-calibrate.py"]
 
 
 

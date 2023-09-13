@@ -5,8 +5,7 @@ from twinmodules.core.util import get_user_json_config
 
 #CDK packages
 from constructs import Construct
-from aws_cdk import App, Stack, Duration
-from aws_cdk import aws_lambda as _lambda
+from aws_cdk import App, Stack, Duration, Aspects
 from aws_cdk import aws_events as events
 from aws_cdk import aws_events_targets as targets
 from aws_cdk import aws_iotsitewise as iotsitewise
@@ -15,8 +14,9 @@ from aws_cdk import aws_batch as batchorg
 from aws_cdk import aws_s3 as s3
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_ec2 as ec2
-from aws_cdk import aws_ecr as ecr
 from aws_cdk import aws_grafana as grafana
+#security checks
+from cdk_nag import AwsSolutionsChecks, NagSuppressions
 
 
 
@@ -27,15 +27,20 @@ class FMUCalibrationStack(Stack):
 
 
         #generate new vpc
-        self.vpc = ec2.Vpc(self, "VPC")
+        self.vpc = ec2.Vpc(self, "VPC",
+                           )
+        self.vpc.add_flow_log('fmuVPCflowlog')
+
 
         # Create an S3 bucket
         s3_bucket = s3.Bucket(
             self,
             json_setup['s3_bucket_name'],
-            versioned=True,  # Enable versioning for the bucket
-            server_access_logs_prefix = 'access_logs_'
+            versioned=True,
+            server_access_logs_prefix = 'access_logs_',
+            enforce_ssl = True,
         )
+        
 
         # Create an AWS Batch compute environment
         batch_compute_environment = batch.ManagedEc2EcsComputeEnvironment(
@@ -202,6 +207,17 @@ json_setup['asset_properties'] = asset_lst
 
 #%% synthesize the cloud formation script
 app = App()
-FMUCalibrationStack(app, "FMUCalibrationStack", json_setup,
+stack = FMUCalibrationStack(app, "FMUCalibrationStack", json_setup,
                     description  = "Guidance for Self-Calibrating Level 4 Digital Twins on AWS (SO1903)")
+Aspects.of(app).add(AwsSolutionsChecks())
+NagSuppressions.add_stack_suppressions(stack,
+                                           [{ 'id':"AwsSolutions-IAM4",
+                                               'reason':"This is example code that a customer "
+                                               +"needs to customize for their application."}
+                                            ])
+NagSuppressions.add_stack_suppressions(stack,
+                                           [{ 'id':"AwsSolutions-IAM5",
+                                               'reason':"This is example code that a customer "
+                                               +"needs to customize for their application."}
+                                            ])
 app.synth()
