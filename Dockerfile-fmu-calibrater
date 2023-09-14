@@ -1,0 +1,21 @@
+FROM python:3.10
+
+RUN apt-get update
+
+RUN git clone --recursive https://github.com/aws-samples/twinflow
+RUN pip install twinflow/twingraph/dist/twingraph-*-py3-none-any.whl
+RUN pip install twinflow/twinmodules/dist/twinmodules-*-py3-none-any.whl
+RUN pip install twinflow/twinstat/dist/twinstat-*-py3-none-any.whl
+
+
+ADD iot_config.json /
+ADD web_line_3_linux.fmu /
+ADD fmu_calibrate.py /
+
+WORKDIR /
+
+
+
+
+
+
