@@ -1,0 +1,55 @@
+The Level 4 Self-Calibrating Digital Twin Architecture includes the following third-part software/licensing:
+
+Python Packages:
+
+Name                               	License                                                                                             
+FMPy                               	Standard 2-clause BSD                                                                               
+Keras-Applications                 	MIT License                                                                                         
+Keras-Preprocessing                	MIT License                                                                                         
+PyMySQL                            	MIT License                                                                                         
+Sphinx                             	BSD License                                                                                         
+autogluon                          	Apache Software License                                                                             
+autogluon.common                   	Apache Software License                                                                             
+autogluon.core                     	Apache Software License                                                                             
+autogluon.features                 	Apache Software License                                                                             
+autogluon.multimodal               	Apache Software License                                                                             
+autogluon.tabular                  	Apache Software License                                                                             
+autogluon.timeseries               	Apache Software License                                                                             
+aws-cdk-lib                        	Apache-2.0                                                                                          
+aws-cdk.asset-awscli-v1            	Apache-2.0                                                                                          
+aws-cdk.asset-kubectl-v20          	Apache-2.0                                                                                          
+aws-cdk.asset-node-proxy-agent-v6  	Apache-2.0                                                                                          
+aws-cdk.aws-batch-alpha            	Apache-2.0                                                                                          
+awswrangler                        	Apache Software License                                                                             
+boto3                              	Apache Software License                                                                             
+botocore                           	Apache Software License                                                                             
+chaospy                            	MIT License                                                                                         
+dexpy                              	Apache Software License                                                                             
+docker                             	Apache Software License                                                                             
+gluonts                            	Apache License 2.0                                                                                  
+gpytorch                           	MIT                                                                                                 
+gremlinpython                      	Apache Software License                                                                             
+h5py                               	BSD License                                                                                         
+joblib                             	BSD License                                                                                         
+kubernetes                         	Apache Software License                                                                             
+matplotlib                         	Python Software Foundation License                                                                  
+multiprocess                       	BSD License                                                                                         
+mysql-connector-python             	GNU General Public License (GPL)                                                                    
+numpy                              	BSD License                                                                                         
+pandas                             	BSD License                                                                                         
+pmdarima                           	MIT                                                                                                 
+pyDOE2                             	BSD License                                                                                         
+pyodbc                             	MIT License                                                                                         
+ray                                	Apache 2.0                                                                                          
+scikit-image                       	BSD License                                                                                         
+scikit-learn                       	BSD License                                                                                         
+scikit-optimize                    	BSD License                                                                                         
+scipy                              	BSD License                                                                                         
+seaborn                            	BSD License                                                                                         
+shap                               	MIT                                                                                                 
+statsmodels                        	BSD License                                                                                         
+tensorflow                         	Apache Software License                                                                             
+tensorflow-probability             	Apache Software License                                                                             
+torch                              	BSD License                                                                                         
+tqdm                               	MIT License; Mozilla Public License 2.0 (MPL 2.0)                                                   
+
