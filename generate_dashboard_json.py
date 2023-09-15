@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Aug 30 15:18:24 2023
-
-@author: ubuntu
-"""
+######################################################################
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved. #
+# SPDX-License-Identifier: MIT-0                                     #
+######################################################################
 
 #generic modules
 import json
 from tqdm import tqdm
+import string
+from itertools import product
 
 #twinmodule packages
 from twinmodules.core.util import get_cloudformation_metadata
@@ -31,10 +32,6 @@ if __name__ == '__main__':
     assetid = metadata['MyCfnAsset']
     #user twinmodules to determine the property ids
     print("Finding property ids")
-    # propertyids = [get_asset_propert_id(config[x],assetid) for x in config.keys()
-    #                            if 'result' in x.lower()          \
-    #                                or 'input' in x.lower()       \
-    #                                or 'uncertainty' in x.lower() ]
 
     propertyids = {}
     for x in tqdm(config.keys()):
@@ -47,18 +44,13 @@ if __name__ == '__main__':
             tmp = get_asset_propert_id(config[x]+'_upper',assetid)
             propertyids[tmp[0]] = tmp[-1]
 
-    #convert to dictionary
-    #propertyids = {key:value for key, v, value in propertyids}
     print("Generating dashboard json")
 
     #create an alphabet lookup for grafana numbering
-    import string
-    from itertools import product
     letters = list(string.ascii_uppercase)
     double_letters = product(letters, letters)
     double_letters = list(map(lambda z: z[0] + z[1], double_letters))
     letters.extend(double_letters)
-
 
     #update panel assetIds and property source ids
     dashboard = template.copy()
@@ -71,10 +63,8 @@ if __name__ == '__main__':
         cnt=0
         for name,pid in propertyids.items():
             #name,pid  = list(propertyids.items())[-10]
-            #panel['targets']['assetIds'] = [assetid]
             tmp = panel['targets'][0].copy()
             tmp['assetIds'] = [assetid]
-            #tmp['refId'] = chr(ord('A') + cnt)
             tmp['refId'] = letters[cnt]
             if 'angular' in panel_name.lower() \
                 and '_w'in name.lower():
@@ -136,5 +126,5 @@ if __name__ == '__main__':
 
     dashboard['panels'] = new_panels
 
-    with open('generated_dashboard2.json', 'w', encoding='utf-8') as f:
+    with open('generated_dashboard.json', 'w', encoding='utf-8') as f:
         json.dump(dashboard, f, ensure_ascii=False, indent=4)

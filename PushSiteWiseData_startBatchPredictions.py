@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Aug 22 15:58:46 2023
-
-@author: rpivovar
-"""
+######################################################################
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved. #
+# SPDX-License-Identifier: MIT-0                                     #
+######################################################################
 
 #generic packages
 import pandas
