@@ -4,18 +4,21 @@
 # Instructions:
 
 
-1) Download the latest twinflow code: <br>     
+1) Download and install the latest twinflow code: <br>     
 ```
 git clone --recursive https://github.com/aws-samples/twinflow
+pip install twinflow/twinstat/dist/*.whl
+pip install twinflow/twinmodules/dist/*.whl
+pip install twinflow/twingraph/dist/*.whl
 ```
 2) Build and push containers to ECR
 
-The example container ```Dockerfile-fmu-calibrate``` includes both building and installation of TwinFlow and embedding the example digital twin.  This digital twin is in the form of an FMU for this example.
+The example container ```Dockerfile-fmu-calibrater``` includes both building and installation of TwinFlow and embedding the example digital twin.  This digital twin is in the form of an FMU for this example.
 
 If you are running on an EC2 instance in the cloud, you can use the small twinmodules cli to quickly build and push to your accounts AWS ECR. For example: <br>
 ```
 alias tfcli="python <path to twinflow>/twinmodules/twinmodules/tfcli.py"
-tfcli -bp --region us-east-1 -t fmu-calibrate -d ./Dockerfile-fmu-calibrate
+tfcli -bp --region us-east-1 -t fmu-calibrate -d ./Dockerfile-fmu-calibrater
 ```
 
 3) Review the user defined options in the ```iot_config.json```.  Note this file contains cloud specific configuration that need to be set based on your account configuration.  Such as the address for your container images, the account region, s3 bucket names, etc.  This file also includes the specific inputs and outputs for the FMU file that will need to be customized to your application.  You can also control numerical configuration for running the FMU such as step stize, solution converge tolerance, number of iterations to wait for convergence, etc. 
