@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon May 15 10:53:20 2023
-
-@author: rpivovar
-
-"""
+######################################################################
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved. #
+# SPDX-License-Identifier: MIT-0                                     #
+######################################################################
 
 
 #generic packages
@@ -12,13 +10,13 @@ import sys
 import pandas
 from functools import reduce
 import numpy as np
-import matplotlib.pyplot as plot
 import random
 import copy
 from tqdm import tqdm
 from datetime import datetime
+#TODO: test with out, installing twinflow with pip should
+#eliminate this from production version
 sys.path.append('/wd')
-
 
 #twinmodule packages
 from twinmodules.core.components import run_fmu
@@ -29,7 +27,6 @@ from twinmodules.AWSModules.AWS_sitewise import send_asset_property_data
 
 #twinstat packages
 from twinstat.statespace_models.estimators import kalman
-
 
 #global variables
 ukf_savepoint = 'ukf_savepoint.npz'
@@ -48,7 +45,7 @@ def get_data(config, metadata):
         tmp.columns = [x  if 'time' in x else name  for x in tmp.columns]
         sitewise_data.append(tmp)
 
-    #merge all streams into one dataframe
+    #merge all streams into one dataframe, ensure timesteps alligned
     dfsw = reduce(lambda  left,right: pandas.merge(left,right,on=['time'],
                                             how='outer'), sitewise_data)
     dfsw = dfsw.dropna()
@@ -109,39 +106,11 @@ def calibrate(dfsw, config, metadata):
     calibrated_mean = []
     calibrated_var = []
 
-    #TODO: add json inputs for measured, inferred, extra vars etc
-    #config['eval_table'] = config['table_name']
     measured = [config[x] for x in config.keys() if 'measured' in x]
-
     measure_cols = measured
-
-    # for col in measured:
-    #     #col = measured[0]
-    #     if 'Roller' in col:
-    #         num = col.split('_')[0]
-    #         num = num.replace('Roller','')
-    #         match = [j for j, x in enumerate(dfsw.columns) if "Main.R{}.w".format(num) in x]
-    #         measure_cols.append(match[0])
-    #     elif 'deg' in col:
-    #         match = [j for j, x in enumerate(dfsw.columns) if 'Dancer' in x]
-    #         measure_cols.append(match[0])
-    #     else:
-    #         match = [j for j, x in enumerate(dfsw.columns) if '.'+col.split('_')[0]+'.' in x]
-    #         measure_cols.append(match[0])
-
-
-    #TODO: do a run with cov calc on all variables despite long runtimes
-    # extra_inferred = [config[x] for x in config.keys() if 'SlipVelocity' in str(config[x])]
-    # extra_inferred = list(set(extra_inferred))
-    # import re
-    # extra_inferred = sorted(extra_inferred, key=lambda s: int(re.search(r'\d+', s).group()))
-    extra_inferred = None
-
     n_damping = 9
     n_measured = len(measured)
-    n_extra = len(extra_inferred) if isinstance(extra_inferred, list) else 0
-
-    total_vars = n_measured + n_extra + n_damping
+    total_vars = n_measured + n_damping
 
     damping_coefficients = np.ones((total_vars,)) * 1e-3
     initial_state = damping_coefficients
@@ -150,7 +119,8 @@ def calibrate(dfsw, config, metadata):
     measurement_noise = np.eye(total_vars) * 1e-5
     process_noise = np.eye(total_vars) * 1e-5
 
-
+    #setup the covariance matrices that have been designed based
+    #on initial scoping data
     for row in range(measurement_noise.shape[0]):
         if row <= 8:
             measurement_noise[row,row] = 1e-11
@@ -160,7 +130,6 @@ def calibrate(dfsw, config, metadata):
             measurement_noise[row,row] = 1e-10
         else:
             measurement_noise[row,row] = 1e-10
-
 
     for row in range(process_noise.shape[0]):
         if row < n_measured:
@@ -177,10 +146,11 @@ def calibrate(dfsw, config, metadata):
     calibrated_mean.append(initial_state)
     calibrated_var.append(initial_state_covariance)
 
-    tf = my_transition_function(config, measured, n_damping,
-                                extra_inferred = extra_inferred,
-                                run_local = True)
+    tf = my_transition_function(config, measured, n_damping, run_local = True)
 
+    #since we have decided to not include Tension in the UKF, this doesnt
+    #do anything, but leaving it in for demo of normalizating scales in the
+    #ukf to ensure easier convergence and design of covariance matrix
     norm = [1.0e3 if 'Tension' in col else 1 for col in measured ]
 
     if s3_object_exist(ukf_savepoint, s3_bucket):
@@ -209,7 +179,7 @@ def calibrate(dfsw, config, metadata):
                      transition_matrix=transition_matrix,
                      measurement_noise=measurement_noise,
                      process_covariance =process_noise,
-                     ncpu= -1, #transition_matrix.shape[1]*2+1,
+                     ncpu= -1, #use all available
                      use_threads=False
                      )
 
@@ -220,7 +190,11 @@ def calibrate(dfsw, config, metadata):
         xhat,xvar = ukf.get_estimate(y)
 
         updates = xhat[-1]
-        updates[n_measured:n_measured+n_damping] = np.clip(updates[n_measured:n_measured+n_damping], 0,0.5)
+        #during initial unconverged solutions could possibly diverge, so add
+        #in a bounding clip for this scenario
+        updates[n_measured:n_measured+n_damping] = np.clip(
+                            updates[n_measured:n_measured+n_damping], 0,0.5
+                            )
         calibrated_mean.append(updates)
         calibrated_var.append(xvar[-1])
 
@@ -312,8 +286,6 @@ if __name__ == '__main__':
 
     import argparse
     parser = argparse.ArgumentParser()
-    #parser.add_argument('-s',  dest='s3', type=str, help="s3 bucket" )
-    #parser.add_argument('-c',  dest='config', type=str, help="Config File" )
     args = parser.parse_args()
 
     config = get_user_json_config('iot_config.json')
