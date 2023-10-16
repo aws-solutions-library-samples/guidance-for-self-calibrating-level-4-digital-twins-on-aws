@@ -21,7 +21,7 @@ from twinmodules.AWSModules.AWS_sitewise import send_asset_property_data
 
 def simulate_data_into_sitewise(assetId, config):
 
-    df= pandas.read_csv("Case_1_Data_2023_06_22.csv", header=1)
+    df= pandas.read_csv("./assets/Case_1_Data_2023_06_22.csv", header=1)
     #need to makesure we stick with sitewise schema
     df = df.astype('float64')
 

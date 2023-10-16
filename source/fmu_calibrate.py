@@ -107,7 +107,6 @@ def calibrate(dfsw, config, metadata):
     calibrated_var = []
 
     measured = [config[x] for x in config.keys() if 'measured' in x]
-    measure_cols = measured
     n_damping = 9
     n_measured = len(measured)
     total_vars = n_measured + n_damping
@@ -169,7 +168,7 @@ def calibrate(dfsw, config, metadata):
     for i in tqdm(range(nsteps)):
         #i=0
 
-        y = dfsw[measure_cols].to_numpy()[i]
+        y = dfsw[measured].to_numpy()[i]
         y/=norm
         y = np.array([y,y])
 
