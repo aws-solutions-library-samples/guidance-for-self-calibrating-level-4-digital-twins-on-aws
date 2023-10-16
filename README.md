@@ -162,7 +162,7 @@ While the CDK is being deployed, you can navigate in AWS Console to the CloudFor
    In production, the user is expected to connect physical sensors to this database and you will _not_ need to run this dummy script during production operation.
 
    ```
-   python PushSiteWiseData_startBatchPredictions.py
+   python ./source/PushSiteWiseData_startBatchPredictions.py
    ```
 
    In AWS Console, users can navigate to IoT SiteWise and watch the dummy script adding data to the database. 
@@ -228,7 +228,7 @@ Select your region and add the data source.
 
 4) Generate a dashboard: We can run a dashboard generation script that will generate a yaml file specific to this Guidance example. 
    
-   a) Run the python script "generate_dashboard_json.py" which will load the dashboard template and fill in the account specific information. A new dashboard json file ("generated_dashboard.json") will be generated.
+   a) Run the python script ```python ./source/generate_dashboard_json.py``` which will load the dashboard template and fill in the account specific information. A new dashboard json file ("generated_dashboard.json") will be generated.
    <br/>b) The generated json file can be imported directly into Grafana, which will define some panels and plot all of the inputs and results defined in the iot_config.json file.  This enables live review of the L4 calibration and the measured IoT data being ingested in IoT SiteWise. Note, depending on how you are running this guidance, you may have to FTP the yaml file back to your local machine to enable uploading to Grafana dashboard setup.
 
 
@@ -303,9 +303,9 @@ The solution can be removed from a user's account by either opening up the EC2 i
 cdk destroy
 ```
 
-An alternative is to use the AWS Console.  Navigate to the CloudFormation page and find the FMUCalibrationStack Stack.  Select the delete stack option and the CloudFormation automation will remove all infrastructure deployed specifically in this stack.  
+An alternative is to use the AWS Console.  Navigate to the CloudFormation page and find the FMUCalibrationStack Stack.  Select the delete stack option and the CloudFormation automation will remove all infrastructure deployed specifically in this stack. Depending on the frequency of EventBridge workers in the ```iot_config.json``` file, the CDK may require some help during clean up.  The CDK will wait for all jobs to finish in Batch before terminating EC2 instnaces, however if EventBridge is generating new jobs too quickly, a user may need to manually terminate the EC2 instance, which will allow CDK to terminate Batch.
 
-Note any S3 Buckets created in this guidance need to be manually deleted as a data safety precaution.  These buckets will continue to incur costs until deleted. 
+Any S3 Buckets created in this guidance need to be manually deleted as a data safety precaution.  These buckets will continue to incur costs until deleted. 
 
 ## Security 
 
