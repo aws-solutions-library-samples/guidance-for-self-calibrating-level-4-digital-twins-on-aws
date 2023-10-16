@@ -66,7 +66,7 @@ class my_transition_function(object):
         self.n_measured = len(measured)
         self.extra_inferred = extra_inferred
 
-    def run_fmu(self,X:np.array) -> np.array:
+    def run_my_fmu(self,X:np.array) -> np.array:
 
         local_config = copy.deepcopy(self.config)
         local_config['uid'] = random.getrandbits(24)
@@ -186,7 +186,7 @@ def calibrate(dfsw, config, metadata):
         # we are setting the state function to be the fmu calculation
         # we are not going to change the observation function since it will
         # be the identity matrix by default
-        ukf.state_func = tf.run_fmu
+        ukf.state_func = tf.run_my_fmu
         xhat,xvar = ukf.get_estimate(y)
 
         updates = xhat[-1]
@@ -239,13 +239,6 @@ def make_prediction(dfsw, config, metadata):
         data = data.astype('float64')
         t = [0.0]
 
-        # sitewise_name = [x for x in sitewise_names if col in x]
-        # #TODO: FIXME
-        # if len(sitewise_name) == 0:
-        #     continue
-
-        # if isinstance(sitewise_name, list):
-        #     sitewise_name=sitewise_name[0]
         data=data.to_numpy()
         print(sitewise_name, data)
 

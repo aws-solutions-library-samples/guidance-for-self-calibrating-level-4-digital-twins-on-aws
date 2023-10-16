@@ -8,13 +8,11 @@
 	"vCPU" : 40,
 	"Mem" : 50000,        	
         "s3_bucket_name" : "'fmudatalake",
-        "lambda_name" : "fmucalibration",
-        "lambda_ecr_repo" : "fmutest2",
         "scheduler_name" : "fmuperiodiccalibration",
         "scheduler_waittime_min" : "1",
         "sitewise_name" : "web-handling-iot-sensors",
         "sample_datafile" : "Case_1_Data_2023_06_22.csv",
-	"fmu_file" : "web_line_3_linux.fmu",	
+	"fmu_file" : "web_line_3_linux.fmu",
 	"fmu_step_size" : 1e-1,	
 	"fmu_stop_time" : 1e6,	
 	"fmu_ss_iterations" : 50,	
@@ -81,4 +79,3 @@
         "measured_7" : "Roller9_w",
         "measured_8" : "Roller10_w"
 }
-
