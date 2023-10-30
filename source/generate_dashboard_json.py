@@ -10,6 +10,7 @@ import json
 from tqdm import tqdm
 import string
 from itertools import product
+import os
 
 #twinmodule packages
 from twinmodules.core.util import get_cloudformation_metadata
@@ -22,9 +23,16 @@ if __name__ == '__main__':
     metadata = get_cloudformation_metadata('FMUCalibrationStack')
 
     template_name = "MainFMUBoard-template.json"
+    configname = "iot_config.json"
+    if not os.path.isfile(template_name):
+        raise ValueError(f"ERROR: couldnt find {template_name} "
+                         +"try running this file one directory higher.")
+    if not os.path.isfile(configname):
+        raise ValueError(f"ERROR: couldnt find {template_name} "
+                         +"try running this file one directory higher.")
+
     with open(template_name,'r') as f:
         template = json.load(f)
-    configname = "iot_config.json"
     with open(configname,'r') as f:
         config = json.load(f)
 

@@ -9,8 +9,8 @@ RUN pip install twinflow/twinstat/dist/twinstat-*-py3-none-any.whl
 
 
 ADD iot_config.json /
-ADD web_line_3_linux.fmu /
-ADD fmu_calibrate.py /
+ADD ./assets/web_line_3_linux.fmu /
+ADD ./source/fmu_calibrate.py /
 
 WORKDIR /
 

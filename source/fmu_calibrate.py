@@ -6,7 +6,6 @@
 
 
 #generic packages
-import sys
 import pandas
 from functools import reduce
 import numpy as np
@@ -14,15 +13,14 @@ import random
 import copy
 from tqdm import tqdm
 from datetime import datetime
-#TODO: test with out, installing twinflow with pip should
-#eliminate this from production version
-sys.path.append('/wd')
+
+#awswrangler packages
+from awswrangler.s3 import does_object_exist, upload, download
 
 #twinmodule packages
 from twinmodules.core.components import run_fmu
 from twinmodules.core.util import get_user_json_config, get_cloudformation_metadata
 from twinmodules.AWSModules.AWS_sitewise import get_asset_property_data
-from twinmodules.AWSModules.AWS_S3 import send_data_s3, s3_object_exist, get_data_s3
 from twinmodules.AWSModules.AWS_sitewise import send_asset_property_data
 
 #twinstat packages
@@ -66,7 +64,7 @@ class my_transition_function(object):
         self.n_measured = len(measured)
         self.extra_inferred = extra_inferred
 
-    def run_fmu(self,X:np.array) -> np.array:
+    def run_my_fmu(self,X:np.array) -> np.array:
 
         local_config = copy.deepcopy(self.config)
         local_config['uid'] = random.getrandbits(24)
@@ -107,7 +105,6 @@ def calibrate(dfsw, config, metadata):
     calibrated_var = []
 
     measured = [config[x] for x in config.keys() if 'measured' in x]
-    measure_cols = measured
     n_damping = 9
     n_measured = len(measured)
     total_vars = n_measured + n_damping
@@ -153,10 +150,9 @@ def calibrate(dfsw, config, metadata):
     #ukf to ensure easier convergence and design of covariance matrix
     norm = [1.0e3 if 'Tension' in col else 1 for col in measured ]
 
-    if s3_object_exist(ukf_savepoint, s3_bucket):
-        get_data_s3( ukf_savepoint,
-                     ukf_savepoint,
-                     s3_bucket)
+    if does_object_exist(f's3://{s3_bucket}/{ukf_savepoint}'):
+        download(path=f's3://{s3_bucket}/{ukf_savepoint}',
+                 local_file = f'./{ukf_savepoint}')
         arr = np.load(ukf_savepoint)
         calibrated_mean = arr['calibrated_mean']
         calibrated_var = arr['calibrated_var']
@@ -169,7 +165,7 @@ def calibrate(dfsw, config, metadata):
     for i in tqdm(range(nsteps)):
         #i=0
 
-        y = dfsw[measure_cols].to_numpy()[i]
+        y = dfsw[measured].to_numpy()[i]
         y/=norm
         y = np.array([y,y])
 
@@ -186,7 +182,7 @@ def calibrate(dfsw, config, metadata):
         # we are setting the state function to be the fmu calculation
         # we are not going to change the observation function since it will
         # be the identity matrix by default
-        ukf.state_func = tf.run_fmu
+        ukf.state_func = tf.run_my_fmu
         xhat,xvar = ukf.get_estimate(y)
 
         updates = xhat[-1]
@@ -205,9 +201,9 @@ def calibrate(dfsw, config, metadata):
             )
 
     #upload calibration
-    send_data_s3( ukf_savepoint,
-                  ukf_savepoint,
-                  s3_bucket)
+    upload(local_file = f'./{ukf_savepoint}',
+           path= f's3://{s3_bucket}/{ukf_savepoint}')
+
 
 #------------------------------------------------------------------------------------------
 def make_prediction(dfsw, config, metadata):
@@ -226,12 +222,10 @@ def make_prediction(dfsw, config, metadata):
     dt = datetime.today()
     now = dt.timestamp()
 
-
     df = run_fmu(damping_coefficients, config,'dummy', 0, use_cloud=False)
     fmu_names = df.columns
 
     for sitewise_name in fmu_names:
-        #sitewise_name = fmu_names[0]
         if sitewise_name not in sitewise_names:
             continue
         data = df[sitewise_name]
@@ -239,13 +233,6 @@ def make_prediction(dfsw, config, metadata):
         data = data.astype('float64')
         t = [0.0]
 
-        # sitewise_name = [x for x in sitewise_names if col in x]
-        # #TODO: FIXME
-        # if len(sitewise_name) == 0:
-        #     continue
-
-        # if isinstance(sitewise_name, list):
-        #     sitewise_name=sitewise_name[0]
         data=data.to_numpy()
         print(sitewise_name, data)
 
