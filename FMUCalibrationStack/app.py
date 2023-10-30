@@ -44,7 +44,7 @@ class FMUCalibrationStack(Stack):
             server_access_logs_prefix = 'access_logs_',
             enforce_ssl = True,
         )
-        
+
 
         # Create an AWS Batch compute environment
         batch_compute_environment = batch.ManagedEc2EcsComputeEnvironment(
@@ -158,7 +158,7 @@ class FMUCalibrationStack(Stack):
          '''any of the AWS Batch jobs will require the ability to read,
          write, overwrite, or delete from s3 buckets
 
-         They also require the ability to push data into sitewise from any 
+         They also require the ability to push data into sitewise from any
          ec2 resource in this demo.
          '''
          batch_instance_role = iam.Role(
@@ -212,7 +212,7 @@ json_setup['asset_properties'] = asset_lst
 #%% synthesize the cloud formation script
 app = App()
 stack = FMUCalibrationStack(app, "FMUCalibrationStack", json_setup,
-                    description  = "Guidance for Self-Calibrating Level 4 Digital Twins on AWS (SO1903)")
+                    description  = "Guidance for Self-Calibrating Level 4 Digital Twins on AWS (SO9323)")
 Aspects.of(app).add(AwsSolutionsChecks())
 NagSuppressions.add_stack_suppressions(stack,
                                            [{ 'id':"AwsSolutions-IAM4",
