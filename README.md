@@ -23,7 +23,7 @@ Digital twins can be a powerful method to provide risk assessment, virtual senso
 
 This guide demonstrates both how to deploy the infrastructure needed to combine a IoT data with a physics based digital twin _and_ how to probablistically calibrate the digital twin with an Unscented Kalman Filter. 
 
-Standard AWS CDK is used to deploy the infrastructure needed for scalable compute including an IoT database.  The opensource tool AWS [TwinFlow](https://github.com/aws-samples/twinflow) is used to achieve the self-calibration of the digital twin.  A blog discussing the overall concepts of this guide can be found [here](https://blog).
+Standard AWS CDK is used to deploy the infrastructure needed for scalable compute including an IoT database.  The opensource tool AWS [TwinFlow](https://github.com/aws-samples/twinflow) is used to achieve the self-calibration of the digital twin.  A blog discussing the overall concepts of this guide can be found [here](https://aws.amazon.com/blogs/hpc/deploying-level-4-digital-twin-self-calibrating-virtual-sensors-on-aws/).
 
 ### Architecture
 </br>
@@ -54,7 +54,7 @@ The cost of this solution is mainly dependant on:
 * Runtime of the digital twin
 * Number of variables being calibrated within the digital twin
 
-In this specific example, discussed in depth [here](https://blog), we are using a small number of IoT datastreams (9 streams), being sampled at 20min intervals, and calibrating a medium/small number of variables (9 variables). Our digital twin has a runtime of around a few seconds. Thus, the actual monthly cost of this solution is less then $10/month.  Costs can dramatically change depending on modification of any of these dependancies.
+In this specific example, discussed in depth [here](https://aws.amazon.com/blogs/hpc/deploying-level-4-digital-twin-self-calibrating-virtual-sensors-on-aws/), we are using a small number of IoT datastreams (9 streams), being sampled at 20min intervals, and calibrating a medium/small number of variables (9 variables). Our digital twin has a runtime of around a few seconds. Thus, the actual monthly cost of this solution is less then $10/month.  Costs can dramatically change depending on modification of any of these dependancies.
 
 ## Prerequisites
 
@@ -148,6 +148,8 @@ cdk deploy
 cd ..
 ```
 While the CDK is being deployed, you can navigate in AWS Console to the CloudFormation page to obtain details on the progress/status/errors of the deployment. 
+
+**Note:** this CDK deployment will __not__ deploy a TwinMaker instance as this example does not include a 3D asset.  Thus, Grafana directly reads data from SiteWise.  
 
 ## Deployment Validation
 
