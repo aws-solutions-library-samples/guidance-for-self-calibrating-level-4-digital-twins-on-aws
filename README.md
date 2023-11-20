@@ -149,7 +149,7 @@ cd ..
 ```
 While the CDK is being deployed, you can navigate in AWS Console to the CloudFormation page to obtain details on the progress/status/errors of the deployment. 
 
-**Note:** this CDK deployment will __not__ deploy a TwinMaker instance as this example does not include a 3D asset.  Thus, Grafana directly reads data from SiteWise.  
+**Note:** this CDK deployment will __not__ deploy a TwinMaker instance as this example does not include a 3D asset.  Thus, Grafana directly reads data from SiteWise. In addition, this CDK is using the dummy data submission script described below instead of an actual edge location.  In production, the user will not use the dummy data submission and instead would setup AWS IoT SiteWise Edge for their application.   
 
 ## Deployment Validation
 
