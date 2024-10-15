@@ -269,7 +269,7 @@ With the newly downloaded data, we can combine the Unscented Kalman Filter and t
 
 If a user is ensure where to start for their application, consider starting the measurment noise with the observed variance in the incoming IoT data. 
 
-TwinFlow utilizes an S3 Bucket to save the current state of the UKF to peristent storage.  Hence, each time a new calibration worker is generated in AWS Batch, TwinFlow will look for an archieved file in an S3 bucket restart the filering.  
+TwinFlow utilizes an S3 Bucket to save the current state of the UKF to peristent storage.  Hence, each time a new calibration worker is generated in AWS Batch, TwinFlow will look for an archived file in an S3 bucket to restart the filtering.  
 
 UKF uses "black box" functions for both the transition function and observation function.  TwinFlow UKF is an object with default functions that exhibit a linear assumption.  In this example, we do not overwrite the observation function as a linear assumption is reasonable.  However, we would like to call the digital twin for each transition function execution. Thus, in this example we create our own function that includes any algorithm a user desires.  Here, we include coefficient clips for stability, we use TwinFlow to execute the FMU and return the values back to the UKF. Notice, that this digital twin is run transiently and TwinFlow will determine when convergence has been achieved terminating the simulation.  
 
@@ -304,7 +304,7 @@ cdk destroy
 
 An alternative is to use the AWS Console.  Navigate to the CloudFormation page and find the FMUCalibrationStack Stack.  Select the delete stack option and the CloudFormation automation will remove all infrastructure deployed specifically in this stack. Depending on the frequency of EventBridge workers in the ```iot_config.json``` file, the CDK may require some help during clean up.  The CDK will wait for all jobs to finish in Batch before terminating EC2 instnaces, however if EventBridge is generating new jobs too quickly, a user may need to manually terminate the EC2 instance, which will allow CDK to terminate Batch.
 
-Any S3 Buckets created in this guidance need to be manually deleted as a data safety precaution.  These buckets will continue to incur costs until deleted. 
+Any S3 Buckets or ECR repos created in this guidance need to be manually deleted as a data safety precaution.  These buckets/repos will continue to incur costs until deleted. 
 
 ## Security 
 
