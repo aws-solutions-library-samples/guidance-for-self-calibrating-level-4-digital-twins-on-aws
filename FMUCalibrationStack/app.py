@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: MIT-0                                     #
 ######################################################################
 
-#twinmodule packages
-from twinmodules.core.util import get_user_json_config
+#generic packages
+import json
 
 #CDK packages
 from constructs import Construct
@@ -13,8 +13,7 @@ from aws_cdk import App, Stack, Duration, Aspects
 from aws_cdk import aws_events as events
 from aws_cdk import aws_events_targets as targets
 from aws_cdk import aws_iotsitewise as iotsitewise
-from aws_cdk import aws_batch_alpha as batch
-from aws_cdk import aws_batch as batchorg
+from aws_cdk import aws_batch as batch
 from aws_cdk import aws_s3 as s3
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_ec2 as ec2
@@ -65,14 +64,14 @@ class FMUCalibrationStack(Stack):
 
         #define Batch job
         #https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_batch/CfnJobDefinition.html
-        job_definition = batchorg.CfnJobDefinition(self, "JobDefinition",
+        job_definition = batch.CfnJobDefinition(self, "JobDefinition",
                                                    type="container",
-                                                   container_properties=batchorg.CfnJobDefinition.ContainerPropertiesProperty(
+                                                   container_properties=batch.CfnJobDefinition.ContainerPropertiesProperty(
                                                                    image=json_setup['calibration_container_image'],
                                                                    #TODO: make this modifiable from json
                                                                    command=['python3.10', 'fmu_calibrate.py'],
                                                                    #execution_role_arn= batch_compute_environment.instance_role,
-                                                                   log_configuration=batchorg.CfnJobDefinition.LogConfigurationProperty(
+                                                                   log_configuration=batch.CfnJobDefinition.LogConfigurationProperty(
                                                                        log_driver="awslogs"),
                                                                    vcpus=json_setup['vCPU'],
                                                                    memory=json_setup['Mem'])
@@ -149,8 +148,9 @@ class FMUCalibrationStack(Stack):
                                                 account_access_type="CURRENT_ACCOUNT",
                                                 authentication_providers=["AWS_SSO"],
                                                 permission_type="SERVICE_MANAGED",
-                                                role_arn = self.create_grafana_role(), #grafana_role.role_arn,
-                                                data_sources=["SITEWISE"]
+                                                role_arn = self.create_grafana_role(),
+                                                data_sources=["SITEWISE"],
+                                                plugin_admin_enabled = True
                                                 )
 
 
@@ -194,9 +194,15 @@ class FMUCalibrationStack(Stack):
         return grafana_role.role_arn
 
 
+
+def get_json(filename):
+    with open(filename,'r') as f:
+        config = json.load(f)
+    return config
+
 #%% setup json inputs
 #------------------------------------------------------------------------------
-json_setup = get_user_json_config('../iot_config.json')
+json_setup = get_json('../iot_config.json')
 
 asset_lst = []
 #define virtual sensor digital predictions

@@ -98,28 +98,19 @@ npm install -g aws-cdk
 ## Deployment Steps:
 
 
-1) Download and install the latest twinflow code: <br>     
-```
-git clone --recursive https://github.com/aws-samples/twinflow
-pip install twinflow/twinstat/dist/*.whl
-pip install twinflow/twinmodules/dist/*.whl
-pip install twinflow/twingraph/dist/*.whl
-```
-2) Build and push containers to ECR
+1) Build and push containers to ECR
 
 The example container ```Dockerfile-fmu-calibrater``` includes both building and installation of TwinFlow and embedding the example digital twin.  This digital twin is in the form of an FMU for this example.
 
-If you are running on an EC2 instance in the cloud, you can use the small twinmodules cli to quickly build and push to your accounts AWS ECR. For example, the following command sets and alias for ease of running the commands: <br>
+If you are running on an EC2 instance in the cloud, use the aws CLI to quickly build and push to your accounts AWS ECR (note via console navigate to ECR and create a repository name for this demo). For example, the following commands build the docker and push to an ECR repo called "fmucalibrate". Update the account number and region. <br>
 ```
-alias tfcli="python <path to twinflow>/twinmodules/twinmodules/tfcli.py"
-```
-The following command sets the region that you are in, in this example it is us-east-1, the docker tag "fmu-calibrate", and the actual docker file that needs to be built and then pushed up to AWS ECR.  Note that tfcli is looking for a full path and not only a file name.
-
-```
-tfcli -bp --region us-east-1 -t fmu-calibrate -d ./Dockerfile-fmu-calibrater
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <account number>.dkr.ecr.us-east-1.amazonaws.com
+docker build -t fmucalibrate .
+docker tag fmucalibrate:latest <account number>.dkr.ecr.us-east-1.amazonaws.com/fmucalibrate:latest
+docker push <account number>.dkr.ecr.us-east-1.amazonaws.com/fmucalibrate:latest
 ```
 
-3) Review the user defined options in the ```iot_config.json```.  Note this file contains cloud specific configuration that need to be set based on your account configuration.  Such as the address for your container images, the account region, s3 bucket names, etc.  This file also includes the specific inputs and outputs for the FMU file that will need to be customized to your application.  You can also control numerical configuration for running the FMU such as step stize, solution converge tolerance, number of iterations to wait for convergence, etc. Notice that the exact address of the container in ECR will change depending on your account and thus, even if you are not trying to customize this guidance, you will need to update the address with your specific account number. 
+2) Review the user defined options in the ```iot_config.json```.  Note this file contains cloud specific configuration that need to be set based on your account configuration.  Such as the address for your container images, the account region, s3 bucket names, etc.  This file also includes the specific inputs and outputs for the FMU file that will need to be customized to your application.  You can also control numerical configuration for running the FMU such as step stize, solution converge tolerance, number of iterations to wait for convergence, etc. Notice that the exact address of the container in ECR will change depending on your account and thus, even if you are not trying to customize this guidance, you will need to update the address with your specific account number. 
 
 </br>
 <center>
@@ -127,15 +118,13 @@ tfcli -bp --region us-east-1 -t fmu-calibrate -d ./Dockerfile-fmu-calibrater
 </center>
 </br>
 
-
 3) Install python packages and deploy CDK IaC
 
 We will be using the standard CDK package and additional features for AWS Batch that are still in an alpha release as of 2023. 
 
 Install CDK Python packages:
 ```
-pip install aws-cdk-lib
-pip install aws-cdk.aws-batch-alpha
+pip install aws-cdk-lib cdk-nag
 ```
 
 Deploy entire infrastructure. Note the cdk bootstrap command is only required once per initial account setup. The synth command generates a cloud formation yaml file.  The cdk deploy command executes the cloud formation yaml file.
@@ -159,12 +148,20 @@ While the CDK is being deployed, you can navigate in AWS Console to the CloudFor
 
 ## Running the Guidance
 
-1) Once you have completed the infrastructure deployment in the previous section, we will need to run a dummy data population script.  This script is simply uploading data in some increments to simulate IoT data being written to the IoT SiteWise database.
+1) Once you have completed the infrastructure deployment in the previous section, we will need to run a dummy data population script. We can leverage the container we already built via:
 
-   In production, the user is expected to connect physical sensors to this database and you will _not_ need to run this dummy script during production operation.
+```
+docker run -it -v /home/ubuntu/.aws:/root/.aws -v ./:/project --network=host --shm-size=20000000m fmucalibrate /bin/bash  
+```
+   
+   This Docker command will interactively run the container, mounting the AWS credentials and the current directory to the container. In addition, the container will use the same network layout as the host EC2 instance. Once inside the container, you can navigate to the 'project' folder to find the cloned repository.
+
+   The synthetic data generationo script is simply uploading data in some increments to simulate IoT data being written to the IoT SiteWise database.
+
+   In production, the user is expected to connect physical sensors to this database and you will _not_ need to run this dummy script during production operation. From within the container:
 
    ```
-   python ./source/PushSiteWiseData_startBatchPredictions.py
+   python /project/source/PushSiteWiseData_startBatchPredictions.py
    ```
 
    In AWS Console, users can navigate to IoT SiteWise and watch the dummy script adding data to the database. 
@@ -218,7 +215,7 @@ While the CDK is being deployed, you can navigate in AWS Console to the CloudFor
    </center>
    </br>
 
-An option for SiteWise should appear:
+An option for SiteWise should appear, click the install button (install the latest version):
 
    </br>
    <center>
@@ -226,11 +223,11 @@ An option for SiteWise should appear:
    </center>
    </br>
 
-Select your region and add the data source. 
+Once installation of the plugin is complete, return to the Data Sources, select Sitewise, select your region and add the data source. 
 
 4) Generate a dashboard: We can run a dashboard generation script that will generate a yaml file specific to this Guidance example. 
    
-   a) Run the python script ```python ./source/generate_dashboard_json.py``` which will load the dashboard template and fill in the account specific information. A new dashboard json file ("generated_dashboard.json") will be generated.
+   a) Run the python script (inside the project folder in the container) ```python ./source/generate_dashboard_json.py``` which will load the dashboard template and fill in the account specific information. A new dashboard json file ("generated_dashboard.json") will be generated.
    <br/>b) The generated json file can be imported directly into Grafana, which will define some panels and plot all of the inputs and results defined in the iot_config.json file.  This enables live review of the L4 calibration and the measured IoT data being ingested in IoT SiteWise. Note, depending on how you are running this guidance, you may have to FTP the yaml file back to your local machine to enable uploading to Grafana dashboard setup.
 
 
@@ -272,7 +269,7 @@ With the newly downloaded data, we can combine the Unscented Kalman Filter and t
 
 If a user is ensure where to start for their application, consider starting the measurment noise with the observed variance in the incoming IoT data. 
 
-TwinFlow utilizes an S3 Bucket to save the current state of the UKF to peristent storage.  Hence, each time a new calibration worker is generated in AWS Batch, TwinFlow will look for an archieved file in an S3 bucket restart the filering.  
+TwinFlow utilizes an S3 Bucket to save the current state of the UKF to peristent storage.  Hence, each time a new calibration worker is generated in AWS Batch, TwinFlow will look for an archived file in an S3 bucket to restart the filtering.  
 
 UKF uses "black box" functions for both the transition function and observation function.  TwinFlow UKF is an object with default functions that exhibit a linear assumption.  In this example, we do not overwrite the observation function as a linear assumption is reasonable.  However, we would like to call the digital twin for each transition function execution. Thus, in this example we create our own function that includes any algorithm a user desires.  Here, we include coefficient clips for stability, we use TwinFlow to execute the FMU and return the values back to the UKF. Notice, that this digital twin is run transiently and TwinFlow will determine when convergence has been achieved terminating the simulation.  
 
@@ -307,7 +304,7 @@ cdk destroy
 
 An alternative is to use the AWS Console.  Navigate to the CloudFormation page and find the FMUCalibrationStack Stack.  Select the delete stack option and the CloudFormation automation will remove all infrastructure deployed specifically in this stack. Depending on the frequency of EventBridge workers in the ```iot_config.json``` file, the CDK may require some help during clean up.  The CDK will wait for all jobs to finish in Batch before terminating EC2 instnaces, however if EventBridge is generating new jobs too quickly, a user may need to manually terminate the EC2 instance, which will allow CDK to terminate Batch.
 
-Any S3 Buckets created in this guidance need to be manually deleted as a data safety precaution.  These buckets will continue to incur costs until deleted. 
+Any S3 Buckets or ECR repos created in this guidance need to be manually deleted as a data safety precaution.  These buckets/repos will continue to incur costs until deleted. 
 
 ## Security 
 
