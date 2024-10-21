@@ -1,0 +1,1673 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_AWS_IOT SITEWISE US-EAST-1",
+      "label": "AWS IoT SiteWise us-east-1",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "grafana-iot-sitewise-datasource",
+      "pluginName": "AWS IoT SiteWise"
+    },
+    {
+      "name": "DS_AWS_IOT TWINMAKER US-EAST-1 FMUTWINMAKERWORKSPACE ",
+      "label": "AWS IoT TwinMaker us-east-1 FMUTwinMakerWorkspace ",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "grafana-iot-twinmaker-datasource",
+      "pluginName": "AWS IoT TwinMaker"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "10.4.1"
+    },
+    {
+      "type": "datasource",
+      "id": "grafana-iot-sitewise-datasource",
+      "name": "AWS IoT SiteWise",
+      "version": "1.25.0"
+    },
+    {
+      "type": "datasource",
+      "id": "grafana-iot-twinmaker-datasource",
+      "name": "AWS IoT TwinMaker",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "grafana-iot-twinmaker-sceneviewer-panel",
+      "name": "AWS IoT TwinMaker Scene Viewer",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": true,
+  "panels": [
+    {
+      "datasource": {
+        "type": "grafana-iot-sitewise-datasource",
+        "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "Roller9_w"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 123131,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "7a4eb412-8586-4f13-9db4-c31208e8015b",
+          "queryType": "PropertyValueHistory",
+          "refId": "A",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "cf528c47-66f6-4bc3-b714-bcf9e19ea632",
+          "queryType": "PropertyValueHistory",
+          "refId": "B",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "89421433-54e3-45b7-81d7-a4c11a8d8e21",
+          "queryType": "PropertyValueHistory",
+          "refId": "C",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "55a9a2bd-f326-42f7-a6d9-17a1a96764d2",
+          "queryType": "PropertyValueHistory",
+          "refId": "D",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "50d94606-d51e-488c-8355-3a2dfb5f4294",
+          "queryType": "PropertyValueHistory",
+          "refId": "E",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "67a155e6-4191-40ab-a355-e3ba74d5df37",
+          "queryType": "PropertyValueHistory",
+          "refId": "F",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "fcd9712b-d45a-4a49-a16b-736f132325c7",
+          "queryType": "PropertyValueHistory",
+          "refId": "G",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "0178cff6-5a6d-434a-a6f9-495d5fc2d652",
+          "queryType": "PropertyValueHistory",
+          "refId": "H",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "4a4c6aca-e206-494b-b4b1-9e30e3b94983",
+          "queryType": "PropertyValueHistory",
+          "refId": "I",
+          "timeOrdering": "ASCENDING"
+        }
+      ],
+      "title": "Roller Angular Velocity",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-iot-sitewise-datasource",
+        "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "b1_lower"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "b1_upper"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.fillBelowTo",
+                "value": "b1_lower"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "b2_lower"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "b2_upper"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.fillBelowTo",
+                "value": "b2_lower"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "b3_lower"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "b3_upper"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.fillBelowTo",
+                "value": "b3_lower"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "b4_lower"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "b4_upper"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.fillBelowTo",
+                "value": "b4_lower"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "b5_lower"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "b5_upper"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.fillBelowTo",
+                "value": "b5_lower"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "b7_lower"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "b7_upper"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.fillBelowTo",
+                "value": "b7_lower"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "b8_lower"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "b8_upper"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.fillBelowTo",
+                "value": "b8_lower"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "b9_lower"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "b9_upper"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.fillBelowTo",
+                "value": "b9_lower"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "b10_lower"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "b10_upper"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.fillBelowTo",
+                "value": "b10_lower"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 123129,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "400284f0-b146-41d2-8c68-d12cf8db6ec6",
+          "queryType": "PropertyValueHistory",
+          "refId": "A",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "6035aded-d663-42b5-a29c-5897be89d5ba",
+          "queryType": "PropertyValueHistory",
+          "refId": "B",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "16ac1628-a6be-4195-91f1-42e363c04024",
+          "queryType": "PropertyValueHistory",
+          "refId": "C",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "95d721d4-1ec1-4c18-997c-d6233b837304",
+          "queryType": "PropertyValueHistory",
+          "refId": "D",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "7ee84370-f4e0-4d04-936e-6f387af104fb",
+          "queryType": "PropertyValueHistory",
+          "refId": "E",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "317b15fb-8f76-4c3f-aa70-5105276827d2",
+          "queryType": "PropertyValueHistory",
+          "refId": "F",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "483bce26-5657-47b5-bc22-f23126139bf5",
+          "queryType": "PropertyValueHistory",
+          "refId": "G",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "aa0f1495-a733-4fbd-abb3-7f092de69a79",
+          "queryType": "PropertyValueHistory",
+          "refId": "H",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "6841df05-d425-48e2-9c96-3fba78ca761a",
+          "queryType": "PropertyValueHistory",
+          "refId": "I",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "c2f39c1e-aef1-4df6-a47e-d058aaa4dfa8",
+          "queryType": "PropertyValueHistory",
+          "refId": "J",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "85b27a3e-2a61-4074-8639-6539bdf7ca1a",
+          "queryType": "PropertyValueHistory",
+          "refId": "K",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "f5466a52-5a34-4c40-9bea-980ff6c47d11",
+          "queryType": "PropertyValueHistory",
+          "refId": "L",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "4c35e6dc-7f7b-4e64-bf45-67c693c51a2d",
+          "queryType": "PropertyValueHistory",
+          "refId": "M",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "9cc859c4-9c43-4b1b-b3f9-48e503a54118",
+          "queryType": "PropertyValueHistory",
+          "refId": "N",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "ba15b21e-e315-41e9-a672-60ab9229fc24",
+          "queryType": "PropertyValueHistory",
+          "refId": "O",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "51f9ebf7-0658-41a1-8a07-09d9aa146a60",
+          "queryType": "PropertyValueHistory",
+          "refId": "P",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "9a8189dc-0ab0-47fb-b781-ef0844e97b20",
+          "queryType": "PropertyValueHistory",
+          "refId": "Q",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "6ccb63b3-f95e-4c40-a06f-69cbd404dbc2",
+          "queryType": "PropertyValueHistory",
+          "refId": "R",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "3703c8f3-a54d-467d-9f69-89dbddd8c47c",
+          "queryType": "PropertyValueHistory",
+          "refId": "S",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "32f1c6bc-df25-4cfd-b4c5-4a2eb2f03855",
+          "queryType": "PropertyValueHistory",
+          "refId": "T",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "392179e2-4f1f-4c21-a143-a4c9d62a8460",
+          "queryType": "PropertyValueHistory",
+          "refId": "U",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "3cbb5b6a-9ea4-406c-9dc8-9905b5702df8",
+          "queryType": "PropertyValueHistory",
+          "refId": "V",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "fd6ed0e2-0f62-4d58-9aa2-38f43437bb34",
+          "queryType": "PropertyValueHistory",
+          "refId": "W",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "bcfaff05-f161-4cf2-b84d-548348cbf245",
+          "queryType": "PropertyValueHistory",
+          "refId": "X",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "15e7a30c-c9b7-4b3e-bc1c-09b9abd95180",
+          "queryType": "PropertyValueHistory",
+          "refId": "Y",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "72a6bd05-2d37-43e8-8757-2024bccccfb9",
+          "queryType": "PropertyValueHistory",
+          "refId": "Z",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "6700c3f1-7c4c-4f1c-b75f-dc3b298d4633",
+          "queryType": "PropertyValueHistory",
+          "refId": "AA",
+          "timeOrdering": "ASCENDING"
+        }
+      ],
+      "title": "Viscous Damping Coefficients",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-iot-sitewise-datasource",
+        "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 123125,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "54063202-a9a9-4cc3-a40e-52d1b9e34529",
+          "queryType": "PropertyValueHistory",
+          "refId": "A",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "4d6bf5c5-2ca4-4e51-8db8-87b44d4d87b4",
+          "queryType": "PropertyValueHistory",
+          "refId": "B",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "7f390441-4316-4a8f-a497-14998c5fecd6",
+          "queryType": "PropertyValueHistory",
+          "refId": "C",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "059fcb62-ba29-4dd4-9a51-a0c6d8fb4c42",
+          "queryType": "PropertyValueHistory",
+          "refId": "D",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "7caa00ef-d271-4c26-bb79-54ba484d9703",
+          "queryType": "PropertyValueHistory",
+          "refId": "E",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "4293dd50-7bf9-4a97-9119-14d91ab4fcb5",
+          "queryType": "PropertyValueHistory",
+          "refId": "F",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "b372c961-5ee0-45c6-9d9d-23f025058fc9",
+          "queryType": "PropertyValueHistory",
+          "refId": "G",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "1803c662-4d98-4040-8dd3-3fb4bf558874",
+          "queryType": "PropertyValueHistory",
+          "refId": "H",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "9fb86679-6092-41d5-b3d5-7e32af3aec8b",
+          "queryType": "PropertyValueHistory",
+          "refId": "I",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "b222b3c1-df83-4676-a8b0-f50c8235392c",
+          "queryType": "PropertyValueHistory",
+          "refId": "J",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "614eefb8-aeb5-4ad7-9f74-a97460f540ed",
+          "queryType": "PropertyValueHistory",
+          "refId": "K",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "94bcfa41-c964-48f4-803d-9c1505d78936",
+          "queryType": "PropertyValueHistory",
+          "refId": "L",
+          "timeOrdering": "ASCENDING"
+        }
+      ],
+      "title": "Span Tension",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-iot-sitewise-datasource",
+        "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 123127,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "f5234fab-fc11-4f8c-bee3-f08563f0add4",
+          "queryType": "PropertyValueHistory",
+          "refId": "A",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "0088e56f-e2d2-4228-b471-8c881d300eaa",
+          "queryType": "PropertyValueHistory",
+          "refId": "B",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "dfdf1bb6-d4ba-46a5-9ddf-0615ff7dbc7a",
+          "queryType": "PropertyValueHistory",
+          "refId": "C",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "a3d3fe18-d20d-4b32-acba-677e97af0f06",
+          "queryType": "PropertyValueHistory",
+          "refId": "D",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "330dddc9-5df9-4a41-9412-83689b8de75f",
+          "queryType": "PropertyValueHistory",
+          "refId": "E",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "c93427cf-15c3-4025-a524-b63ce5709aa1",
+          "queryType": "PropertyValueHistory",
+          "refId": "F",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "14805875-cad9-4a87-bf3b-540a26367b74",
+          "queryType": "PropertyValueHistory",
+          "refId": "G",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "bfb38857-07e3-4fa2-8fef-354494f17ccf",
+          "queryType": "PropertyValueHistory",
+          "refId": "H",
+          "timeOrdering": "ASCENDING"
+        },
+        {
+          "assetIds": [
+            "bc06424a-7366-4d52-81bc-76e83b5e8d5a"
+          ],
+          "datasource": {
+            "type": "grafana-iot-sitewise-datasource",
+            "uid": "${DS_AWS_IOT SITEWISE US-EAST-1}"
+          },
+          "maxPageAggregations": 1,
+          "propertyId": "fe98f65b-d424-4cf1-8bce-81c481578bd0",
+          "queryType": "PropertyValueHistory",
+          "refId": "I",
+          "timeOrdering": "ASCENDING"
+        }
+      ],
+      "title": "Slip Velocity",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-iot-twinmaker-datasource",
+        "uid": "${DS_AWS_IOT TWINMAKER US-EAST-1 FMUTWINMAKERWORKSPACE }"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "id": 123132,
+      "options": {
+        "datasource": "${DS_AWS_IOT TWINMAKER US-EAST-1 FMUTWINMAKERWORKSPACE }",
+        "enableAutoQuery": false,
+        "queryRefreshInterval": 5,
+        "sceneId": "web-handling-scene"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-iot-twinmaker-datasource",
+            "uid": "${DS_AWS_IOT TWINMAKER US-EAST-1 FMUTWINMAKERWORKSPACE }"
+          },
+          "queryType": "GetAlarms",
+          "refId": "A"
+        }
+      ],
+      "title": "TwinMaker Scene",
+      "type": "grafana-iot-twinmaker-sceneviewer-panel"
+    }
+  ],
+  "refresh": "5s",
+  "revision": 1,
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "timepicker": {
+    "hidden": false,
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ],
+    "type": "timepicker"
+  },
+  "timezone": "browser",
+  "title": "MainFMUBoard",
+  "uid": "WzgJn4zSk",
+  "version": 2,
+  "weekStart": ""
+}
