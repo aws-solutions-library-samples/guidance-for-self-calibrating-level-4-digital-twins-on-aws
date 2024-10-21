@@ -251,6 +251,14 @@ Once installation of the plugin is complete, return to the Data Sources, select 
    </center>
    </br>
 
+With the dashboard imported we should see the following combination of phyisical sensors, virtual sensors, calibration coefficients, and TwinMaker 3D models. 
+
+   </br>
+   <center>
+   <img src="./assets/images/screenshot_grafana_dashboard_final.PNG" width=600>
+   </center>
+   </br>
+
 
 ## Description of TwinFlow Script
 
