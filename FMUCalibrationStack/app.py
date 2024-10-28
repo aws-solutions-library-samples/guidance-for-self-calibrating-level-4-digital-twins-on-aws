@@ -172,7 +172,6 @@ class FMUCalibrationStack(Stack):
             asset_properties=iot_asset_properties
         )
 
-        #twinmaker_workspace, model_component_type = self.create_twinmaker_workspace(json_setup['twinmaker_workspace_name'], s3_bucket)
         twinmaker_workspace = self.create_twinmaker_workspace(json_setup['twinmaker_workspace_name'], s3_bucket)
         twinmaker_workspace.node.add_dependency(s3_bucket)
 
