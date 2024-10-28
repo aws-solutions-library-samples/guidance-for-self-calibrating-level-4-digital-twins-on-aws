@@ -1,6 +1,6 @@
 {
 	"region_name" : "us-east-1",
-	"calibration_container_image" : "873069797454.dkr.ecr.us-east-1.amazonaws.com/fmucalibrate",
+	"calibration_container_image" : "<account number>.dkr.ecr.us-east-1.amazonaws.com/fmucalibrate",
 	"logGroupName" : "/aws/batch/job",
     "batch_name" : "dtBatchpredictioncompute",
     "twinmaker_workspace_name": "FMUTwinMakerWorkspace",
