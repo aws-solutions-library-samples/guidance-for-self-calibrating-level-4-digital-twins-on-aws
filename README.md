@@ -120,8 +120,6 @@ docker push <account number>.dkr.ecr.us-east-1.amazonaws.com/fmucalibrate:latest
 
 3) Install python packages and deploy CDK IaC
 
-We will be using the standard CDK package and additional features for AWS Batch that are still in an alpha release as of 2023. 
-
 Install CDK Python packages:
 ```
 pip install aws-cdk-lib cdk-nag
@@ -136,9 +134,26 @@ cdk synth
 cdk deploy
 cd ..
 ```
-While the CDK is being deployed, you can navigate in AWS Console to the CloudFormation page to obtain details on the progress/status/errors of the deployment. 
 
-**Note:** this CDK deployment will __not__ deploy a TwinMaker instance as this example does not include a 3D asset.  Thus, Grafana directly reads data from SiteWise. In addition, this CDK is using the dummy data submission script described below instead of an actual edge location.  In production, the user will not use the dummy data submission and instead would setup AWS IoT SiteWise Edge for their application.   
+During CDK deployment, you can monitor the progress, status, and any errors by navigating to the CloudFormation page in the AWS Console. This CDK deployment will create a TwinMaker instance using the 3D asset located in the "./assets/3dassets" directory.
+
+Grafana directly reads data from SiteWise for both physical and virtual sensors. The 3D asset is deployed through TwinMaker.
+
+It's important to note that this CDK setup uses a dummy data submission script instead of an actual edge location. In a production environment, users would not use this dummy data submission. Instead, they would configure a service such as AWS IoT SiteWise Edge for their specific application.
+
+Run the python script (inside the project folder in the container) ```python ./source/generate_dashboard_json.py``` which will load the dashboard template and fill in the account specific information. A new dashboard json file ("generated_dashboard.json") will be generated and added to the newly created S3 Bucket (we will use this file during the Grafana setup).
+
+Run the python script (inside the project folder in the container) ```python ./source/generate_twinmaker_scene_json.py``` which will load the dashboard template and fill in the account specific information. A new dashboard json file ("generated_FirstScene.json") will be generated and will be used by the final TwinMaker setup.
+
+Last step will again use CDK but now we will deploy a TwinMaker scene which connects the IoT SiteWise data to the 3D model we uploaded in the previous step.
+
+```
+cd TwinMakerSceneStack
+cdk synth
+cdk deploy
+cd ..
+```
+
 
 ## Deployment Validation
 
@@ -156,7 +171,7 @@ docker run -it -v /home/ubuntu/.aws:/root/.aws -v ./:/project --network=host --s
    
    This Docker command will interactively run the container, mounting the AWS credentials and the current directory to the container. In addition, the container will use the same network layout as the host EC2 instance. Once inside the container, you can navigate to the 'project' folder to find the cloned repository.
 
-   The synthetic data generationo script is simply uploading data in some increments to simulate IoT data being written to the IoT SiteWise database.
+   The synthetic data generation script is simply uploading data in some increments to simulate IoT data being written to the IoT SiteWise database.
 
    In production, the user is expected to connect physical sensors to this database and you will _not_ need to run this dummy script during production operation. From within the container:
 
@@ -215,7 +230,7 @@ docker run -it -v /home/ubuntu/.aws:/root/.aws -v ./:/project --network=host --s
    </center>
    </br>
 
-An option for SiteWise should appear, click the install button (install the latest version):
+An option for SiteWise should appear, click the install button (install the latest version). Repeat this step for TwinMaker to enable adding 3D assets to the Grafana dashboard. 
 
    </br>
    <center>
@@ -223,17 +238,24 @@ An option for SiteWise should appear, click the install button (install the late
    </center>
    </br>
 
-Once installation of the plugin is complete, return to the Data Sources, select Sitewise, select your region and add the data source. 
+Once installation of the plugin is complete, return to the Data Sources, select Sitewise, select your region and add the data source. Repeat this step for TwinMaker. One additional step is needed to complete the connection of Grafana and TwinMaker, which is to insert the "DemoTwinMakerRole" IAM ARN into the data source of the Grafana plugin. The  ```python ./source/generate_dashboard_json.py``` in step 4 will print to screen the text needed to be copied and pasted into Grafana. If you recieve any errors about "assumed roles" it is due likely due to the Grafana plugin not understanding the permissions for the connections. 
 
 4) Generate a dashboard: We can run a dashboard generation script that will generate a yaml file specific to this Guidance example. 
    
-   a) Run the python script (inside the project folder in the container) ```python ./source/generate_dashboard_json.py``` which will load the dashboard template and fill in the account specific information. A new dashboard json file ("generated_dashboard.json") will be generated.
-   <br/>b) The generated json file can be imported directly into Grafana, which will define some panels and plot all of the inputs and results defined in the iot_config.json file.  This enables live review of the L4 calibration and the measured IoT data being ingested in IoT SiteWise. Note, depending on how you are running this guidance, you may have to FTP the yaml file back to your local machine to enable uploading to Grafana dashboard setup.
-
+   a) At this point we should have run the python script (inside the project folder in the container) ```python ./source/generate_dashboard_json.py``` which will load the dashboard template and fill in the account specific information. A new dashboard json file ("generated_dashboard.json") will be generated.
+   <br/>b) The generated json file can be imported directly into Grafana, which will define some panels and plot all of the inputs and results defined in the iot_config.json file.  This enables live review of the L4 calibration and the measured IoT data being ingested in IoT SiteWise. Download the generated json file from the s3 bucket using the console enabling use with Grafana setup. 
 
    </br>
    <center>
    <img src="./assets/images/screenshot_grafana_dashboard_import.PNG" width=600>
+   </center>
+   </br>
+
+With the dashboard imported we should see the following combination of phyisical sensors, virtual sensors, calibration coefficients, and TwinMaker 3D models. 
+
+   </br>
+   <center>
+   <img src="./assets/images/screenshot_grafana_dashboard_final.PNG" width=600>
    </center>
    </br>
 
@@ -291,20 +313,24 @@ Key areas to customize for a different application are:
 
 * The digital twin embedded in the containers
 * Parameters in the TwinFLow calibration script
-* json inputs
+* Json inputs
 
 
 ## Clean Up
 
-The solution can be removed from a user's account by either opening up the EC2 instance and navigating back to the CDK directory (FMUCalibrationStack). Within this directory run the command:
+The solution can be removed from a user's account by either opening up the EC2 instance and navigating back to the CDK directory (TwinMakerSceneStack). Within this directory run the following commands:
 
 ```
+cd TwinMakerSceneStack
+cdk destroy
+cd ..
+cd FMUCalibrationStack
 cdk destroy
 ```
 
 An alternative is to use the AWS Console.  Navigate to the CloudFormation page and find the FMUCalibrationStack Stack.  Select the delete stack option and the CloudFormation automation will remove all infrastructure deployed specifically in this stack. Depending on the frequency of EventBridge workers in the ```iot_config.json``` file, the CDK may require some help during clean up.  The CDK will wait for all jobs to finish in Batch before terminating EC2 instnaces, however if EventBridge is generating new jobs too quickly, a user may need to manually terminate the EC2 instance, which will allow CDK to terminate Batch.
 
-Any S3 Buckets or ECR repos created in this guidance need to be manually deleted as a data safety precaution.  These buckets/repos will continue to incur costs until deleted. 
+Any ECR repos created in this guidance need to be manually deleted as a data safety precaution.  These repos will continue to incur costs until deleted. 
 
 ## Security 
 

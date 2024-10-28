@@ -6,6 +6,7 @@
 
 #generic packages
 import json
+import os
 
 #CDK packages
 from constructs import Construct
@@ -18,10 +19,22 @@ from aws_cdk import aws_s3 as s3
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_ec2 as ec2
 from aws_cdk import aws_grafana as grafana
+from aws_cdk import aws_iottwinmaker as twinmaker
+from aws_cdk import aws_s3_deployment as s3deploy
+from aws_cdk import RemovalPolicy
+from aws_cdk import custom_resources as cr
 #security checks
 from cdk_nag import AwsSolutionsChecks, NagSuppressions
 
+import boto3
 
+def get_aws_account_and_region():
+    sts = boto3.client('sts')
+    account_id = sts.get_caller_identity()["Account"]
+    region = boto3.session.Session().region_name
+    return account_id, region
+
+account_id, region = get_aws_account_and_region()
 
 class FMUCalibrationStack(Stack):
 
@@ -32,16 +45,38 @@ class FMUCalibrationStack(Stack):
         #generate new vpc
         self.vpc = ec2.Vpc(self, "VPC",
                            )
-        self.vpc.add_flow_log('fmuVPCflowlog')
+
+        self.grafana_role =self.create_grafana_role()
+        self.twinmaker_role = self.create_twinmaker_role()
 
 
         # Create an S3 bucket
         s3_bucket = s3.Bucket(
             self,
             json_setup['s3_bucket_name'],
-            versioned=True,
-            server_access_logs_prefix = 'access_logs_',
+            #versioned=True,
+            #server_access_logs_prefix = 'access_logs_',
             enforce_ssl = True,
+            removal_policy=RemovalPolicy.DESTROY,
+            auto_delete_objects=True
+        )
+
+        # Grant the custom resource the necessary permissions to delete the bucket contents
+        cr.AwsCustomResource(self, "BucketCleanup",
+            on_delete=cr.AwsSdkCall(
+                service="S3",
+                action="deleteObjects",
+                parameters={
+                    "Bucket": s3_bucket.bucket_name,
+                    "Delete": {
+                        "Objects": [{"Key": "dummy"}]
+                    }
+                },
+                physical_resource_id=cr.PhysicalResourceId.of(s3_bucket.bucket_name)
+            ),
+            policy=cr.AwsCustomResourcePolicy.from_sdk_calls(
+                resources=cr.AwsCustomResourcePolicy.ANY_RESOURCE
+            )
         )
 
 
@@ -64,7 +99,7 @@ class FMUCalibrationStack(Stack):
 
         #define Batch job
         #https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_batch/CfnJobDefinition.html
-        job_definition = batch.CfnJobDefinition(self, "JobDefinition",
+        job_definition = batch.CfnJobDefinition(self, "JobDefinitionL4DT",
                                                    type="container",
                                                    container_properties=batch.CfnJobDefinition.ContainerPropertiesProperty(
                                                                    image=json_setup['calibration_container_image'],
@@ -79,7 +114,7 @@ class FMUCalibrationStack(Stack):
 
         # Create an EventBridge rule to trigger the Batch job
         rule = events.Rule(
-            self, "EventRule",
+            self, "EventRuleL4DT",
             schedule=events.Schedule.rate( Duration.minutes(int(json_setup['scheduler_waittime_min']) ) )
         )
 
@@ -137,6 +172,47 @@ class FMUCalibrationStack(Stack):
             asset_properties=iot_asset_properties
         )
 
+        twinmaker_workspace = self.create_twinmaker_workspace(json_setup['twinmaker_workspace_name'], s3_bucket)
+        twinmaker_workspace.node.add_dependency(s3_bucket)
+
+        # Upload 3D model to S3
+        s3_deployment = s3deploy.BucketDeployment(
+            self, "DeployModel",
+            sources=[s3deploy.Source.asset(os.path.dirname(json_setup['twinmaker_3d_model']))],
+            destination_bucket=s3_bucket,
+            destination_key_prefix="twinmaker/3d-models"
+        )
+
+
+        model_name = json_setup['twinmaker_3d_model'].split('/')[-1]
+
+        entity = twinmaker.CfnEntity(
+                self, "TwinMakerEntity",
+                entity_name="WebHandlingEntity",
+                workspace_id=twinmaker_workspace.workspace_id,
+                components={
+                    "sitewiseComponent": twinmaker.CfnEntity.ComponentProperty(
+                        component_name="sitewiseComponent",
+                        component_type_id="com.amazon.iotsitewise.connector",
+                        properties={
+                            "sitewiseAssetId": twinmaker.CfnEntity.PropertyProperty(
+                                value=twinmaker.CfnEntity.DataValueProperty(
+                                    string_value=cfn_asset.attr_asset_id
+                                )
+                            ),
+                            "sitewiseAssetModelId": twinmaker.CfnEntity.PropertyProperty(
+                                value=twinmaker.CfnEntity.DataValueProperty(
+                                    string_value=cfn_asset_model.attr_asset_model_id  # Assuming you have an asset model resource
+                                )
+                            )
+                        }
+                    ),
+                }
+            )
+
+        entity.add_dependency(twinmaker_workspace)
+        entity.node.add_dependency(s3_deployment)
+
 
         # Create Grafana dashboard for post-processing
 
@@ -148,11 +224,61 @@ class FMUCalibrationStack(Stack):
                                                 account_access_type="CURRENT_ACCOUNT",
                                                 authentication_providers=["AWS_SSO"],
                                                 permission_type="SERVICE_MANAGED",
-                                                role_arn = self.create_grafana_role(),
+                                                role_arn = self.grafana_role.role_arn,
                                                 data_sources=["SITEWISE"],
                                                 plugin_admin_enabled = True
                                                 )
 
+
+        # Add CORS configuration to S3 bucket after Grafana workspace is created
+        self.add_cors_to_s3_bucket(s3_bucket, grafana_instance)
+
+    def create_twinmaker_workspace(self, workspace_name, s3_bucket):
+        workspace = twinmaker.CfnWorkspace(
+            self, "DemoTwinMakerWorkspace",
+            workspace_id=workspace_name,
+            role=self.twinmaker_role.role_arn,
+            s3_location=f"arn:aws:s3:::{s3_bucket.bucket_name}"
+        )
+
+        return workspace
+
+    def create_3d_model_component_type(self, workspace_id):
+        return twinmaker.CfnComponentType(
+            self, "3DModelComponentType",
+            workspace_id=workspace_id,
+            component_type_id="com.example.iottwinmaker.3dmodel",
+            description="3D Model Component Type",
+            property_definitions={
+                "s3Arn": {
+                    "dataType": {
+                        "type": "STRING"
+                    },
+                    "is_time_series": False
+                }
+            }
+        )
+
+    def create_twinmaker_role(self):
+        twinmaker_role = iam.Role(
+            self, "DemoTwinMakerRole",
+            assumed_by=iam.CompositePrincipal(
+                    iam.ServicePrincipal("iottwinmaker.amazonaws.com"),
+                    iam.ServicePrincipal("grafana.amazonaws.com"),
+                    iam.AccountPrincipal(account_id),
+                    iam.ArnPrincipal(self.grafana_role.role_arn)
+                ),
+        )
+        twinmaker_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("AWSIoTSiteWiseReadOnlyAccess"))
+        twinmaker_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess"))
+        twinmaker_role.add_to_policy(iam.PolicyStatement(
+            actions=[
+                "iottwinmaker:*",
+            ],
+            resources=["*"]
+        ))
+
+        return twinmaker_role
 
     def create_batch_instance_role(self):
          '''any of the AWS Batch jobs will require the ability to read,
@@ -186,14 +312,63 @@ class FMUCalibrationStack(Stack):
     def create_grafana_role(self):
         grafana_role = iam.Role(
             self, "GrafanaFMURole",
-            assumed_by=iam.ServicePrincipal("grafana.amazonaws.com"),
+            assumed_by=iam.CompositePrincipal(
+                iam.ServicePrincipal("grafana.amazonaws.com"),
+                iam.AccountPrincipal(account_id)
+            ),
             managed_policies=[
-                iam.ManagedPolicy.from_aws_managed_policy_name("AWSIoTSiteWiseReadOnlyAccess")
+                iam.ManagedPolicy.from_aws_managed_policy_name("AWSIoTSiteWiseReadOnlyAccess"),
+                iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3ReadOnlyAccess")
             ]
         )
-        return grafana_role.role_arn
+        grafana_role.add_to_policy(iam.PolicyStatement(
+            actions=[
+                "iottwinmaker:*",
+            ],
+            resources=["*"]
+        ))
+        return grafana_role
 
 
+    def add_cors_to_s3_bucket(self, bucket, grafana_workspace):
+        cors_configuration = [
+            {
+                "AllowedHeaders": ["*"],
+                "AllowedMethods": ["GET", "HEAD"],
+                "AllowedOrigins": [f"https://{grafana_workspace.attr_endpoint}"],
+                "ExposeHeaders": ["ETag"],
+                "MaxAgeSeconds": 3000
+            }
+        ]
+
+        cr.AwsCustomResource(
+            self, "S3BucketCorsConfiguration",
+            on_create=cr.AwsSdkCall(
+                service="S3",
+                action="putBucketCors",
+                parameters={
+                    "Bucket": bucket.bucket_name,
+                    "CORSConfiguration": {
+                        "CORSRules": cors_configuration
+                    }
+                },
+                physical_resource_id=cr.PhysicalResourceId.of(f"{bucket.bucket_name}-cors")
+            ),
+            on_update=cr.AwsSdkCall(
+                service="S3",
+                action="putBucketCors",
+                parameters={
+                    "Bucket": bucket.bucket_name,
+                    "CORSConfiguration": {
+                        "CORSRules": cors_configuration
+                    }
+                },
+                physical_resource_id=cr.PhysicalResourceId.of(f"{bucket.bucket_name}-cors")
+            ),
+            policy=cr.AwsCustomResourcePolicy.from_sdk_calls(
+                resources=[bucket.bucket_arn]
+            )
+        )
 
 def get_json(filename):
     with open(filename,'r') as f:
@@ -227,6 +402,21 @@ NagSuppressions.add_stack_suppressions(stack,
                                             ])
 NagSuppressions.add_stack_suppressions(stack,
                                            [{ 'id':"AwsSolutions-IAM5",
+                                               'reason':"This is example code that a customer "
+                                               +"needs to customize for their application."}
+                                            ])
+NagSuppressions.add_stack_suppressions(stack,
+                                           [{ 'id':"AwsSolutions-L1",
+                                               'reason':"This is example code that a customer "
+                                               +"needs to customize for their application."}
+                                            ])
+NagSuppressions.add_stack_suppressions(stack,
+                                           [{ 'id':"AwsSolutions-VPC7",
+                                               'reason':"This is example code that a customer "
+                                               +"needs to customize for their application."}
+                                            ])
+NagSuppressions.add_stack_suppressions(stack,
+                                           [{ 'id':"AwsSolutions-S1",
                                                'reason':"This is example code that a customer "
                                                +"needs to customize for their application."}
                                             ])

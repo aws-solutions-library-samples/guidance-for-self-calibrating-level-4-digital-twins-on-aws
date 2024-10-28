@@ -11,18 +11,90 @@ from tqdm import tqdm
 import string
 from itertools import product
 import os
+import boto3
 
 #twinmodule packages
-from twinmodules.core.util import get_cloudformation_metadata
 from twinmodules.AWSModules.AWS_sitewise import get_asset_propert_id
 
+
+def copy_json_to_s3(local_file_path, bucket_name, s3_file_key):
+    """
+    Copy a JSON file to an S3 bucket.
+
+    :param local_file_path: Path to the local JSON file
+    :param bucket_name: Name of the S3 bucket
+    :param s3_file_key: The key (path) where the file will be stored in S3
+    :return: True if successful, False otherwise
+    """
+    # Initialize the S3 client
+    s3_client = boto3.client('s3')
+
+    try:
+        # Verify that the local file exists
+        if not os.path.exists(local_file_path):
+            print(f"Error: The file {local_file_path} does not exist.")
+            return False
+
+        # Verify that the file is a valid JSON
+        with open(local_file_path, 'r') as file:
+            json.load(file)  # This will raise an exception if the JSON is invalid
+
+        # Upload the file to S3
+        s3_client.upload_file(local_file_path, bucket_name, s3_file_key)
+
+        print(f"Successfully uploaded {local_file_path} to s3://{bucket_name}/{s3_file_key}")
+        return True
+
+    except json.JSONDecodeError:
+        print(f"Error: The file {local_file_path} is not a valid JSON file.")
+        return False
+    except boto3.exceptions.S3UploadFailedError as e:
+        print(f"Error uploading file to S3: {str(e)}")
+        return False
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
+        return False
+
+def get_asset_id(stack_name, asset_logical_id="MyCfnAsset"):
+    # Initialize CloudFormation and IoT SiteWise clients
+    cf_client = boto3.client('cloudformation')
+    sitewise_client = boto3.client('iotsitewise')
+
+    try:
+        # Get the physical ID of the asset from CloudFormation
+        response = cf_client.describe_stack_resource(
+            StackName=stack_name,
+            LogicalResourceId=asset_logical_id
+        )
+        physical_id = response['StackResourceDetail']['PhysicalResourceId']
+
+        # Use the physical ID to get the asset details from IoT SiteWise
+        response = sitewise_client.describe_asset(assetId=physical_id)
+        asset_name = response['assetName']
+
+        # Verify if the asset name matches "web-handling-Asset"
+        if asset_name == "web-handling-Asset":
+            return physical_id
+        else:
+            # If the asset name doesn't match, search for it
+            paginator = sitewise_client.get_paginator('list_assets')
+            for page in paginator.paginate():
+                for asset in page['assetSummaries']:
+                    if asset['name'] == "web-handling-Asset":
+                        return asset['id']
+
+        raise Exception("Asset 'web-handling-Asset' not found")
+
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return None
 
 #%% main
 if __name__ == '__main__':
 
-    metadata = get_cloudformation_metadata('FMUCalibrationStack')
+    stack_name = 'FMUCalibrationStack'
 
-    template_name = "MainFMUBoard-template.json"
+    template_name = "./assets/MainFMUBoard-template.json"
     configname = "iot_config.json"
     if not os.path.isfile(template_name):
         raise ValueError(f"ERROR: couldnt find {template_name} "
@@ -37,8 +109,8 @@ if __name__ == '__main__':
         config = json.load(f)
 
     #cloud formation provides the generated asset id
-    assetid = metadata['MyCfnAsset']
-    #user twinmodules to determine the property ids
+    assetid = get_asset_id(stack_name)
+    #use twinmodules to determine the property ids
     print("Finding property ids")
 
     propertyids = {}
@@ -128,11 +200,31 @@ if __name__ == '__main__':
 
 
         new_panel = panel.copy()
-        new_panel['fieldConfig']['overrides'] = overrides
+        if 'fieldConfig' in new_panel.keys():
+            new_panel['fieldConfig']['overrides'] = overrides
         new_panel['targets'] = new_target
         new_panels.append( new_panel)
 
     dashboard['panels'] = new_panels
 
-    with open('generated_dashboard.json', 'w', encoding='utf-8') as f:
+    local_file_path = 'generated_dashboard.json'
+    with open(local_file_path, 'w', encoding='utf-8') as f:
         json.dump(dashboard, f, ensure_ascii=False, indent=4)
+
+    cf_client = boto3.client('cloudformation')
+    stack_resources = cf_client.describe_stack_resources(StackName=stack_name)
+    s3_bucket_resource = next((r for r in stack_resources['StackResources'] if r['ResourceType'] == 'AWS::S3::Bucket'), None)
+    s3_bucket_name = s3_bucket_resource['PhysicalResourceId']
+
+    copy_json_to_s3(local_file_path, s3_bucket_name, local_file_path)
+
+
+    dt_iam_resource = next((r for r in stack_resources['StackResources']
+                        if r['ResourceType'] == 'AWS::IAM::Role'
+                        and 'DemoTwinMakerRole' in r['LogicalResourceId']), None)
+    dt_iam_arn = dt_iam_resource['PhysicalResourceId']
+
+    print(f"\nThe IAM ARN to copy into Grafana is: {dt_iam_arn}\n")
+
+
+
