@@ -238,7 +238,7 @@ An option for SiteWise should appear, click the install button (install the late
    </center>
    </br>
 
-Once installation of the plugin is complete, return to the Data Sources, select Sitewise, select your region and add the data source. Repeat this step for TwinMaker. One additional step is needed to complete the connection of Grafana and TwinMaker, which is to insert the "DemoTwinMakerRole" IAM ARN into the data source of the Grafana plugin.  If you recieve any errors about "assumed roles" it is due likely due to the Grafana plugin not understanding the permissions for the connections. 
+Once installation of the plugin is complete, return to the Data Sources, select Sitewise, select your region and add the data source. Repeat this step for TwinMaker. One additional step is needed to complete the connection of Grafana and TwinMaker, which is to insert the "DemoTwinMakerRole" IAM ARN into the data source of the Grafana plugin. The  ```python ./source/generate_dashboard_json.py``` in step 4 will print to screen the text needed to be copied and pasted into Grafana. If you recieve any errors about "assumed roles" it is due likely due to the Grafana plugin not understanding the permissions for the connections. 
 
 4) Generate a dashboard: We can run a dashboard generation script that will generate a yaml file specific to this Guidance example. 
    
