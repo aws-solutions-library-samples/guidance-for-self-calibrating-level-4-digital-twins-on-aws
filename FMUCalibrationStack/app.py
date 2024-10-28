@@ -208,47 +208,11 @@ class FMUCalibrationStack(Stack):
                             )
                         }
                     ),
-                    # "3DModel": twinmaker.CfnEntity.ComponentProperty(
-                    #     component_name="3DModel",
-                    #     component_type_id="com.example.iottwinmaker.3dmodel",
-                    #     properties={
-                    #         "s3Arn": twinmaker.CfnEntity.PropertyProperty(
-                    #             value=twinmaker.CfnEntity.DataValueProperty(
-                    #                 string_value=f"arn:aws:s3:::{s3_bucket.bucket_name}/twinmaker/3d-models/{model_name}"
-                    #             )
-                    #         )
-                    #     }
-                    # )
                 }
             )
 
         entity.add_dependency(twinmaker_workspace)
         entity.node.add_dependency(s3_deployment)
-
-
-        # Deploy the scene content to S3
-        # s3_deployment_scene = s3deploy.BucketDeployment(
-        #     self, "DeploySceneContent",
-        #     sources=[s3deploy.Source.asset(os.path.dirname(json_setup['twinmaker_3d_scene']))],
-        #     destination_bucket=s3_bucket,
-        #     destination_key_prefix="twinmaker/scenes"
-        # )
-
-        #scene_name = json_setup['twinmaker_3d_scene'].split('/')[-1]
-        # Create a TwinMaker Scene
-        # scene = twinmaker.CfnScene(
-        #     self, "WebHandlingScene",
-        #     content_location=f"s3://{s3_bucket.bucket_name}/twinmaker/scenes/{scene_name}",
-        #     scene_id="web-handling-scene",
-        #     workspace_id=twinmaker_workspace.workspace_id
-        # )
-
-        # # Ensure the scene is created after the workspace and entity
-        # scene.add_dependency(twinmaker_workspace)
-        # scene.add_dependency(entity)
-        # scene.node.add_dependency(s3_deployment_scene)
-
-
 
 
         # Create Grafana dashboard for post-processing
@@ -278,13 +242,7 @@ class FMUCalibrationStack(Stack):
             s3_location=f"arn:aws:s3:::{s3_bucket.bucket_name}"
         )
 
-        # Create the 3D model component type
-        #model_component_type = self.create_3d_model_component_type(workspace.workspace_id)
-
-        # Ensure the component type is created after the workspace
-        #model_component_type.add_dependency(workspace)
-
-        return workspace #, model_component_type
+        return workspace
 
     def create_3d_model_component_type(self, workspace_id):
         return twinmaker.CfnComponentType(
@@ -305,13 +263,11 @@ class FMUCalibrationStack(Stack):
     def create_twinmaker_role(self):
         twinmaker_role = iam.Role(
             self, "DemoTwinMakerRole",
-            #assumed_by=iam.ServicePrincipal("iottwinmaker.amazonaws.com"),
             assumed_by=iam.CompositePrincipal(
                     iam.ServicePrincipal("iottwinmaker.amazonaws.com"),
                     iam.ServicePrincipal("grafana.amazonaws.com"),
                     iam.AccountPrincipal(account_id),
                     iam.ArnPrincipal(f"arn:aws:iam::{account_id}:role/service-role/AmazonGrafanaServiceRole-2uDOB8x9f"),
-                    #iam.ArnPrincipal(f"arn:aws:iam::{account_id}:role/service-role/{grafanakey}")
                     iam.ArnPrincipal(self.grafana_role.role_arn)
                 ),
         )
@@ -324,11 +280,6 @@ class FMUCalibrationStack(Stack):
             resources=["*"]
         ))
 
-        # twinmaker_role.assume_role_policy.add_statements(iam.PolicyStatement(
-        #     actions=["sts:AssumeRole"],
-        #     effect=iam.Effect.ALLOW,
-        #     principals=[iam.ServicePrincipal("grafana.amazonaws.com")]
-        # ))
         return twinmaker_role
 
     def create_batch_instance_role(self):
@@ -363,7 +314,6 @@ class FMUCalibrationStack(Stack):
     def create_grafana_role(self):
         grafana_role = iam.Role(
             self, "GrafanaFMURole",
-            #assumed_by=iam.ServicePrincipal("grafana.amazonaws.com"),
             assumed_by=iam.CompositePrincipal(
                 iam.ServicePrincipal("grafana.amazonaws.com"),
                 iam.AccountPrincipal(account_id)
@@ -379,18 +329,6 @@ class FMUCalibrationStack(Stack):
             ],
             resources=["*"]
         ))
-        # # Add permission to assume the TwinMaker role
-        # grafana_role.add_to_policy(iam.PolicyStatement(
-        #     actions=["sts:AssumeRole"],
-        #     resources=[self.twinmaker_role.role_arn]  # Assuming you have a reference to the TwinMaker role
-        # ))
-        # Add a statement to allow Grafana to assume this role
-        # grafana_role.assume_role_policy.add_statements(iam.PolicyStatement(
-        #     actions=["sts:AssumeRole"],
-        #     effect=iam.Effect.ALLOW,
-        #     principals=[iam.ServicePrincipal("grafana.amazonaws.com")]
-        # ))
-        #return grafana_role.role_arn
         return grafana_role
 
 

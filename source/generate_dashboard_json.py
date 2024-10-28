@@ -212,9 +212,22 @@ if __name__ == '__main__':
         json.dump(dashboard, f, ensure_ascii=False, indent=4)
 
 
+    #TODO: print to screen the IAM ARN that the user needs to copy and paste into Grafana for twinmaker access
+
     cf_client = boto3.client('cloudformation')
     stack_resources = cf_client.describe_stack_resources(StackName=stack_name)
     s3_bucket_resource = next((r for r in stack_resources['StackResources'] if r['ResourceType'] == 'AWS::S3::Bucket'), None)
     s3_bucket_name = s3_bucket_resource['PhysicalResourceId']
 
     copy_json_to_s3(local_file_path, s3_bucket_name, local_file_path)
+
+
+    dt_iam_resource = next((r for r in stack_resources['StackResources']
+                        if r['ResourceType'] == 'AWS::IAM::Role'
+                        and 'DemoTwinMakerRole' in r['LogicalResourceId']), None)
+    dt_iam_arn = dt_iam_resource['PhysicalResourceId']
+
+    print(f"\nThe IAM ARN to copy into Grafana is: {dt_iam_arn}\n")
+
+
+
