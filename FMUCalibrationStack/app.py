@@ -266,7 +266,6 @@ class FMUCalibrationStack(Stack):
                     iam.ServicePrincipal("iottwinmaker.amazonaws.com"),
                     iam.ServicePrincipal("grafana.amazonaws.com"),
                     iam.AccountPrincipal(account_id),
-                    iam.ArnPrincipal(f"arn:aws:iam::{account_id}:role/service-role/AmazonGrafanaServiceRole-2uDOB8x9f"),
                     iam.ArnPrincipal(self.grafana_role.role_arn)
                 ),
         )
